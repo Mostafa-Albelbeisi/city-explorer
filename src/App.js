@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import Weather from "./Components/Weather";
 
 class App extends React.Component {
   constructor(props) {
@@ -71,6 +72,7 @@ class App extends React.Component {
         {this.state.errFlag && <h4>Error : sorry something went wrong!</h4>}
         {this.state.mapFlag && <button onClick={this.zoomIn}>Zoom In</button>}
         {this.state.mapFlag && <button onClick={this.zoomOut}>Zoom Out</button>}
+        <Weather/>
       </div>
     );
   }
