@@ -1,52 +1,27 @@
 import React from "react";
-import axios from "axios";
 
-class Weather extends React.Component{
-    constructor(props){
-        super(props)
-        this.state = {
-            cityName: "",
-            longitudeAPI: "",
-            latitudeAPI: "",
-          
-        }
-    }
+var index = 0;
 
-    getWeatherData = async(event) => {
-        const cityWeather = event.target.weather.value;
-        const URL = `http://localhost:3001/weather?name=${cityWeather}`;
-        console.log(URL);
-
-        try {
-            let result = await axios.get(URL);
-            this.setState({
-                cityName: result.data[0].city_name,
-                longitudeAPI: result.data[0].lon,
-                latitudeAPI: result.data[0].lat
-            })
-            console.log(result.data, "")
-            
-        } catch  {
-            
-        }
-    }
-
-    
-    render(){
-        return(
+class Weather extends React.Component {
+  render() {
+    index = 0;
+    return (
+      <>
+        <h2>Weather Data:</h2>
+        {this.props.weatherData.map((item) => {
+          return (
             <div>
-                <form onSubmit={this.getWeatherData} >
-            <input type='text' name='weather' placeholder="Search" />
-            <button type='submit'>Search</button>
-        </form>
-
-        <h3>City: {this.state.cityName}</h3>
-        <h5>Longitude From API: {this.state.longitudeAPI}</h5>
-        <h5>Latitude From API: {this.state.latitudeAPI}</h5>
+              <h4>Day {index++}</h4>
+              <p>date: {item.date}</p>
+              <p>min Temp: {item.minTemp}</p>
+              <p>max Temp: {item.maxTemp}</p>
+              <p>description:{item.description}</p>
             </div>
-        )
-    }
-    
+          );
+        })}
+      </>
+    );
+  }
 }
-export default Weather;
 
+export default Weather;
