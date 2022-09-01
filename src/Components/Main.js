@@ -1,92 +1,71 @@
 import React from "react";
 import axios from "axios";
-import Forms from "./Forms";
+import { Card } from "react-bootstrap";
+import { ListGroup } from "react-bootstrap";
 import Weather from "./Weather";
-import Movie from "./Movie";
-import Location from "./Location";
-import Row from "react-bootstrap/Row";
-import Form from "react-bootstrap/Form";
 
-var name;
 class Main extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      weatherData: [],
-      movieData: [],
-      errFlag: "",
-      errors: false,
+      cityName: "",
+      lat: "",
+      lon: "",
+      zoom: 18,
+      errorMsg: false,
+      mapImg: false,
+      Weather: [],
+    };
+
+    getLocationData = async (event) => {
+      event.preventDefault();
+      const cityName = event.target.city.value;
+      const URL = `https://us1.locationiq.com/v1/search?key=${process.env.REACT_APP_MAP_KEY}&q=${cityName}&format=json&zoom=${this.state.zoom}`;
+
+      try {
+        let resResult = await axios.get(URL);
+        this.setState({
+          cityName: resResult.data[0].display_name,
+          lat: resResult.data[0].lat,
+          lon: resResult.data[0].lon,
+          mapImg: true,
+          errorMsg: false,
+        });
+        this.getWeatherData(resResult.data[0].lat, resResult.data[0].lon);
+      } catch {
+        this.setState({
+          errorMsg: true,
+        });
+      }
+    };
+    getWeatherData = async (lat, lon) => {
+      try {
+        let resResult = await axios.get(
+          `${process.env.REACT_APP_SERVER}/weather?lat=${lat}&lon=${lon}`
+        );
+        this.setState({
+          weather: resResult.data,
+          errorMsg: false,
+        });
+      } catch {
+        this.setState({
+          errorMsg: true,
+        });
+      }
+    };
+    zoomIn = () => {
+      if (this.state.zoom < 18) {
+        this.setState({
+          zoom: this.state.zoom + 1,
+        });
+      }
+    };
+    zoomOut = () => {
+      if (this.state.zoom > 0) {
+        this.setState({
+          zoom: this.state.zoom - 1,
+        });
+      }
     };
   }
-  getWeatherData = async (event) => {
-    event.preventDefault();
-    name = event.target.cityName.value;
-
-    const url = `${process.env.REACT_APP_URL}weatherData?city=${name}`;
-
-    axios
-      .get(url)
-      .then((result) => {
-        this.setState({
-          weatherData: result.data,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setState({
-          errFlag: true,
-          errors: error,
-        });
-      });
-
-    this.getMovieData(name);
-  };
-  getMovieData = async (name) => {
-    const url2 = `${process.env.REACT_APP_URL}movieData?city=${name}`;
-    axios
-      .get(url2)
-      .then((result) => {
-        this.setState({
-          movieData: result.data,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setState({
-          errFlag: true,
-          errors: error,
-        });
-      });
-  };
-
-  cityInfo(item) {
-    if (item.cityName === name) {
-      return (
-        <>
-          <h3>City Name: {item.cityName}</h3>
-          <h3>Lon: {item.cityLon}</h3>
-          <h3> Lat: {item.cityLat}</h3>
-        </>
-      );
-    }
-  }
-
-  render() {
-    return (
-      <div>
-        <Form getWeatherData={this.getWeatherData} />
-        <Location
-          weatherData={this.state.weatherData}
-          cityInfo={this.cityInfo}
-        />
-        {this.state.errFlag && this.state.errors}
-        <Row xs={1} md={4} className="g-4">
-          <Movie movieData={this.state.movieData} />
-        </Row>
-        <Weather weatherData={this.state.weatherData} />
-      </div>
-    );
-  }
 }
-
-export default Main;
