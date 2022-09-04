@@ -1,27 +1,29 @@
 import React from "react";
+import WeatherDay from "./WeatherDay";
 
-var index = 0;
 
 class Weather extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      weatherData: this.props.weather,
+    };
+  }
+
   render() {
-    index = 0;
     return (
-      <>
-        <h2>Weather Data:</h2>
-        {this.props.weatherData.map((item) => {
-          return (
-            <div>
-              <h4>Day {index++}</h4>
-              <p>date: {item.date}</p>
-              <p>min Temp: {item.minTemp}</p>
-              <p>max Temp: {item.maxTemp}</p>
-              <p>description:{item.description}</p>
-            </div>
-          );
-        })}
-      </>
+        <table>
+          <tr>
+            <th>Date</th>
+            <th>Forecast</th>
+          </tr>
+          {this.props.weather.map((day) => (
+            <tr>
+              <WeatherDay day={day} />
+            </tr>
+          ))}
+        </table>
     );
   }
 }
-
 export default Weather;

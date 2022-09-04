@@ -16,6 +16,7 @@ class Main extends React.Component {
       mapImg: false,
       Weather: [],
     };
+  }
 
     getLocationData = async (event) => {
       event.preventDefault();
@@ -31,17 +32,17 @@ class Main extends React.Component {
           mapImg: true,
           errorMsg: false,
         });
-        this.getWeatherData(resResult.data[0].lat, resResult.data[0].lon);
+        this.getWeatherData (resResult.data[0].lat, resResult.data[0].lon);
       } catch {
         this.setState({
           errorMsg: true,
         });
       }
     };
-    getWeatherData = async (lat, lon) => {
+    getWeatherData  = async (lat, lon) => {
       try {
         let resResult = await axios.get(
-          `${process.env.REACT_APP_SERVER}/weather?lat=${lat}&lon=${lon}`
+          `${process.env.REACT_APP_URL}/weather?lat=${lat}&lon=${lon}`
         );
         this.setState({
           weather: resResult.data,
@@ -66,6 +67,60 @@ class Main extends React.Component {
           zoom: this.state.zoom - 1,
         });
       }
-    };
   }
-}
+
+   render() {
+    return(
+      <div>
+      <br></br>
+      <br></br>
+
+      <br></br>
+
+      <form onSubmit={this.getLocationData}>
+        <input type="text" name="city" placeholder="Enter a city" />
+        <button type="submit">Explore!</button>
+      </form>
+      <br></br>
+      <br></br>
+      <br></br>
+
+     
+      {this.state.mapImg && <Card style={{ width: "40rem" }}>
+        
+        {this.state.mapImg && (
+          <Card.Img
+            variant="top"
+            src={`https://maps.locationiq.com/v3/staticmap?key=pk.1c9bb206af5e67499ccb1c24d7dc1d11&center=${this.state.lat},${this.state.lon}&zoom=${this.state.zoom}`}
+          />
+        )}
+        <Card.Body>
+          {this.state.mapImg && (
+            <button onClick={this.zoomIn}>Zoom In</button>
+          )}
+          <span> </span>
+
+          {this.state.mapImg && (
+            <button onClick={this.zoomOut}>Zoom Out</button>
+          )}
+          <Card.Title>Name {this.state.cityName}</Card.Title>
+        </Card.Body>
+        <ListGroup>
+          <ListGroup.Item>Latitude: {this.state.lat}</ListGroup.Item>
+          <ListGroup.Item>Longitude: {this.state.lon}</ListGroup.Item>
+          <Weather weather = {this.state.weather}/>
+
+        </ListGroup>
+        {this.state.errorMsg &&<Card.Body>
+           (
+            <h4>Error : sorry something went wrong!</h4>
+          )
+        </Card.Body>}
+      </Card>}
+    </div>
+    );
+   }
+  }
+
+
+export default Main;
